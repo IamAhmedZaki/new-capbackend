@@ -520,7 +520,7 @@ const capOrderAdminEmail = (orderData) => {
           <div class="section">
             <p><strong>📅 Ordredato:</strong> ${new Date(orderDate).toLocaleString('da-DK')}</p>
             <p><strong>🔢 Ordrenummer:</strong> ${orderNumber}</p>
-            <p><strong>📧 Kunde kontakt:</strong> ${email}</p>
+            <p><strong>📧 Kunde kontakt:</strong> ${customerDetails.email}</p>
           </div>
         </div>
       </div>
