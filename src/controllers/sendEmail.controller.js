@@ -455,6 +455,14 @@ const capOrderAdminEmail = (orderData) => {
         table { width: 100%; border-collapse: collapse; }
         .alert { background: #fef3c7; padding: 10px; border-radius: 5px; border-left: 4px solid #f59e0b; margin-bottom: 15px; }
         .priority { background: #fee2e2; padding: 10px; border-radius: 5px; border-left: 4px solid #ef4444; margin-bottom: 15px; }
+        .payment-pending {
+  background: #fff3cd;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+  margin-bottom: 15px;
+  color: #856404;
+}
       </style>
     </head>
     <body>
