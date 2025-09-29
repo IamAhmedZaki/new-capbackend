@@ -149,18 +149,58 @@ const capOrderEmail = (orderData) => {
           return Object.entries(value)
             .map(([subKey, subValue]) => {
               if (subValue && subValue !== '' && subValue !== null) {
-                return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${subKey.replace(/([A-Z])/g, ' $1').trim()}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
+                return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(subKey)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
               }
               return '';
             })
             .join('');
         }
         if (value && value !== '' && value !== null) {
-          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${key.replace(/([A-Z])/g, ' $1').trim()}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
+          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
         }
         return '';
       })
       .join('');
+  };
+
+  const formatLabel = (label) => {
+    const labelMap = {
+      'firstName': 'Fornavn',
+      'lastName': 'Efternavn',
+      'email': 'E-mail',
+      'phone': 'Telefon',
+      'Skolenavn': 'Skolenavn',
+      'address': 'Adresse',
+      'city': 'By',
+      'postalCode': 'Postnummer',
+      'country': 'Land',
+      'notes': 'Bemærkninger',
+      'deliverToSchool': 'Leveres til skole',
+      'KOKARDE': 'Kokarde',
+      'Roset farve': 'Roset farve',
+      'Kokarde': 'Kokarde',
+      'Emblem': 'Emblem',
+      'Type': 'Type',
+      'TILBEHØR': 'Tilbehør',
+      'Hueæske': 'Hueæske',
+      'Premium æske': 'Premium æske',
+      'Huekuglepen': 'Huekuglepen',
+      'Silkepude': 'Silkepude',
+      'Ekstra korkarde': 'Ekstra korkarde',
+      'Ekstra korkarde Text': 'Ekstra korkarde tekst',
+      'Handsker': 'Handsker',
+      'Stor kuglepen': 'Stor kuglepen',
+      'Smart Tag': 'Smart Tag',
+      'Lyskugle': 'Lyskugle',
+      'Luksus champagneglas': 'Luksus champagneglas',
+      'Fløjte': 'Fløjte',
+      'Trrompet': 'Trompet',
+      'Bucketpins': 'Bucketpins',
+      'STØRRELSE': 'Størrelse',
+      'Vælg størrelse': 'Vælg størrelse',
+      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt'
+    };
+    return labelMap[label] || label.replace(/([A-Z])/g, ' $1').trim();
   };
 
   const formatValue = (value) => {
@@ -168,11 +208,15 @@ const capOrderEmail = (orderData) => {
       return value.name || value.value || JSON.stringify(value);
     }
     if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
+      return value ? 'Ja' : 'Nej';
     }
     if (value === '') {
-      return 'Not specified';
+      return 'Ikke angivet';
     }
+    if (value === 'No') return 'Nej';
+    if (value === 'Yes') return 'Ja';
+    if (value === 'Standard') return 'Standard';
+    if (value === 'NONE') return 'Ingen';
     return value;
   };
 
@@ -194,30 +238,31 @@ const capOrderEmail = (orderData) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎩 Your Custom Cap Order</h1>
-          <p>Order Number: ${orderNumber}</p>
+          <h1>🎩 Din Tilpassede Hue Ordre</h1>
+          <p>Ordrenummer: ${orderNumber}</p>
         </div>
         
         <div class="content">
           <div class="section">
-            <h2>Customer Information</h2>
-            <p><strong>Name:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
-            <p><strong>Email:</strong> ${customerDetails.email}</p>
-            <p><strong>Phone:</strong> ${customerDetails.phone}</p>
-            ${customerDetails.company ? `<p><strong>Company:</strong> ${customerDetails.company}</p>` : ''}
-            <p><strong>Address:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
-            ${customerDetails.notes ? `<p><strong>Notes:</strong> ${customerDetails.notes}</p>` : ''}
+            <h2>Kundeinformation</h2>
+            <p><strong>Navn:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
+            <p><strong>E-mail:</strong> ${customerDetails.email}</p>
+            <p><strong>Telefon:</strong> ${customerDetails.phone}</p>
+            ${customerDetails.Skolenavn ? `<p><strong>Skolenavn:</strong> ${customerDetails.Skolenavn}</p>` : ''}
+            <p><strong>Adresse:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
+            ${customerDetails.notes ? `<p><strong>Bemærkninger:</strong> ${customerDetails.notes}</p>` : ''}
+            ${customerDetails.deliverToSchool ? `<p><strong>Leveres til skole:</strong> Ja</p>` : ''}
           </div>
 
           <div class="section">
-            <h2>Cap Configuration</h2>
+            <h2>Hue Konfiguration</h2>
             ${Object.entries(selectedOptions)
               .map(([category, options]) => {
                 const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
                 if (!hasOptions) return '';
                 
                 return `
-                  <h3>${category.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                  <h3>${formatLabel(category)}</h3>
                   <table>
                     ${formatOptions(options)}
                   </table>
@@ -227,13 +272,13 @@ const capOrderEmail = (orderData) => {
           </div>
 
           <div class="total">
-            <h2>Total Amount</h2>
+            <h2>Total Beløb</h2>
             <p style="font-size: 24px; margin: 0;">${totalPrice} ${currency}</p>
           </div>
 
           <div class="section">
-            <p><strong>Order Date:</strong> ${new Date(orderDate).toLocaleDateString()}</p>
-            <p>Thank you for your order! We'll process it shortly and contact you if we need any additional information.</p>
+            <p><strong>Ordredato:</strong> ${new Date(orderDate).toLocaleDateString('da-DK')}</p>
+            <p>Tak for din ordre! Vi behandler den snarest og kontakter dig, hvis vi har brug for yderligere oplysninger.</p>
           </div>
         </div>
       </div>
@@ -242,22 +287,23 @@ const capOrderEmail = (orderData) => {
   `;
 
   const text = `
-    CUSTOM CAP ORDER CONFIRMATION
-    ==============================
+    TILPASSET HUE ORDRE BEKRÆFTELSE
+    ================================
 
-    Order Number: ${orderNumber}
-    Order Date: ${new Date(orderDate).toLocaleDateString()}
+    Ordrenummer: ${orderNumber}
+    Ordredato: ${new Date(orderDate).toLocaleDateString('da-DK')}
 
-    CUSTOMER INFORMATION:
-    --------------------
-    Name: ${customerDetails.firstName} ${customerDetails.lastName}
-    Email: ${customerDetails.email}
-    Phone: ${customerDetails.phone}
-    ${customerDetails.company ? `Company: ${customerDetails.company}` : ''}
-    Address: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
-    ${customerDetails.notes ? `Notes: ${customerDetails.notes}` : ''}
+    KUNDEINFORMATION:
+    -----------------
+    Navn: ${customerDetails.firstName} ${customerDetails.lastName}
+    E-mail: ${customerDetails.email}
+    Telefon: ${customerDetails.phone}
+    ${customerDetails.Skolenavn ? `Skolenavn: ${customerDetails.Skolenavn}` : ''}
+    Adresse: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
+    ${customerDetails.notes ? `Bemærkninger: ${customerDetails.notes}` : ''}
+    ${customerDetails.deliverToSchool ? `Leveres til skole: Ja` : ''}
 
-    CAP CONFIGURATION:
+    HUE KONFIGURATION:
     ------------------
     ${Object.entries(selectedOptions)
       .map(([category, options]) => {
@@ -265,7 +311,7 @@ const capOrderEmail = (orderData) => {
         if (!hasOptions) return '';
         
         return `
-        ${category.replace(/([A-Z])/g, ' $1').trim().toUpperCase()}:
+        ${formatLabel(category).toUpperCase()}:
         ${Object.entries(options)
           .map(([key, value]) => {
             if (value && value !== '' && value !== null) {
@@ -273,13 +319,13 @@ const capOrderEmail = (orderData) => {
                 return Object.entries(value)
                   .map(([subKey, subValue]) => {
                     if (subValue && subValue !== '' && subValue !== null) {
-                      return `  ${subKey.replace(/([A-Z])/g, ' $1').trim()}: ${formatValue(subValue)}`;
+                      return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
                     }
                     return '';
                   })
                   .join('\n');
               }
-              return `  ${key.replace(/([A-Z])/g, ' $1').trim()}: ${formatValue(value)}`;
+              return `  ${formatLabel(key)}: ${formatValue(value)}`;
             }
             return '';
           })
@@ -288,19 +334,20 @@ const capOrderEmail = (orderData) => {
       })
       .join('\n')}
 
-    TOTAL AMOUNT:
-    -------------
+    TOTAL BELØB:
+    ------------
     ${totalPrice} ${currency}
 
-    Thank you for your order! We'll process it shortly.
+    Tak for din ordre! Vi behandler den snarest.
   `;
 
   return {
-    subject: `🎩 Cap Order Confirmation - ${orderNumber}`,
+    subject: `🎩 Hue Ordre Bekræftelse - ${orderNumber}`,
     html,
     text
   };
 };
+
 const capOrderAdminEmail = (orderData) => {
   const {
     customerDetails,
@@ -320,18 +367,58 @@ const capOrderAdminEmail = (orderData) => {
           return Object.entries(value)
             .map(([subKey, subValue]) => {
               if (subValue && subValue !== '' && subValue !== null) {
-                return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${subKey.replace(/([A-Z])/g, ' $1').trim()}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
+                return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(subKey)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
               }
               return '';
             })
             .join('');
         }
         if (value && value !== '' && value !== null) {
-          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${key.replace(/([A-Z])/g, ' $1').trim()}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
+          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
         }
         return '';
       })
       .join('');
+  };
+
+  const formatLabel = (label) => {
+    const labelMap = {
+      'firstName': 'Fornavn',
+      'lastName': 'Efternavn',
+      'email': 'E-mail',
+      'phone': 'Telefon',
+      'Skolenavn': 'Skolenavn',
+      'address': 'Adresse',
+      'city': 'By',
+      'postalCode': 'Postnummer',
+      'country': 'Land',
+      'notes': 'Bemærkninger',
+      'deliverToSchool': 'Leveres til skole',
+      'KOKARDE': 'Kokarde',
+      'Roset farve': 'Roset farve',
+      'Kokarde': 'Kokarde',
+      'Emblem': 'Emblem',
+      'Type': 'Type',
+      'TILBEHØR': 'Tilbehør',
+      'Hueæske': 'Hueæske',
+      'Premium æske': 'Premium æske',
+      'Huekuglepen': 'Huekuglepen',
+      'Silkepude': 'Silkepude',
+      'Ekstra korkarde': 'Ekstra korkarde',
+      'Ekstra korkarde Text': 'Ekstra korkarde tekst',
+      'Handsker': 'Handsker',
+      'Stor kuglepen': 'Stor kuglepen',
+      'Smart Tag': 'Smart Tag',
+      'Lyskugle': 'Lyskugle',
+      'Luksus champagneglas': 'Luksus champagneglas',
+      'Fløjte': 'Fløjte',
+      'Trrompet': 'Trompet',
+      'Bucketpins': 'Bucketpins',
+      'STØRRELSE': 'Størrelse',
+      'Vælg størrelse': 'Vælg størrelse',
+      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt'
+    };
+    return labelMap[label] || label.replace(/([A-Z])/g, ' $1').trim();
   };
 
   const formatValue = (value) => {
@@ -339,11 +426,15 @@ const capOrderAdminEmail = (orderData) => {
       return value.name || value.value || JSON.stringify(value);
     }
     if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
+      return value ? 'Ja' : 'Nej';
     }
     if (value === '') {
-      return 'Not specified';
+      return 'Ikke angivet';
     }
+    if (value === 'No') return 'Nej';
+    if (value === 'Yes') return 'Ja';
+    if (value === 'Standard') return 'Standard';
+    if (value === 'NONE') return 'Ingen';
     return value;
   };
 
@@ -367,38 +458,39 @@ const capOrderAdminEmail = (orderData) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎩 NEW CAP ORDER RECEIVED</h1>
-          <p>Order Number: ${orderNumber} | ${new Date(orderDate).toLocaleDateString()}</p>
+          <h1>🎩 NY HUE ORDRE MODTAGET</h1>
+          <p>Ordrenummer: ${orderNumber} | ${new Date(orderDate).toLocaleDateString('da-DK')}</p>
         </div>
         
         <div class="content">
           <div class="priority">
-            <strong>🚨 ACTION REQUIRED:</strong> New order received and needs to be processed.
+            <strong>🚨 HANDLING PÅKRÆVET:</strong> Ny ordre modtaget og skal behandles.
           </div>
           
           <div class="alert">
-            <strong>📧 Customer Email:</strong> ${email}
+            <strong>📧 Kunde e-mail:</strong> ${email}
           </div>
 
           <div class="section">
-            <h2>👤 Customer Information</h2>
-            <p><strong>Name:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
-            <p><strong>Email:</strong> ${customerDetails.email}</p>
-            <p><strong>Phone:</strong> ${customerDetails.phone}</p>
-            ${customerDetails.company ? `<p><strong>Company:</strong> ${customerDetails.company}</p>` : ''}
-            <p><strong>Address:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
-            ${customerDetails.notes ? `<p><strong>Customer Notes:</strong> ${customerDetails.notes}</p>` : ''}
+            <h2>👤 Kundeinformation</h2>
+            <p><strong>Navn:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
+            <p><strong>E-mail:</strong> ${customerDetails.email}</p>
+            <p><strong>Telefon:</strong> ${customerDetails.phone}</p>
+            ${customerDetails.Skolenavn ? `<p><strong>Skolenavn:</strong> ${customerDetails.Skolenavn}</p>` : ''}
+            <p><strong>Adresse:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
+            ${customerDetails.notes ? `<p><strong>Kundens bemærkninger:</strong> ${customerDetails.notes}</p>` : ''}
+            ${customerDetails.deliverToSchool ? `<p><strong>Leveres til skole:</strong> Ja</p>` : ''}
           </div>
 
           <div class="section">
-            <h2>⚙️ Cap Configuration</h2>
+            <h2>⚙️ Hue Konfiguration</h2>
             ${Object.entries(selectedOptions)
               .map(([category, options]) => {
                 const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
                 if (!hasOptions) return '';
                 
                 return `
-                  <h3>${category.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                  <h3>${formatLabel(category)}</h3>
                   <table>
                     ${formatOptions(options)}
                   </table>
@@ -408,14 +500,14 @@ const capOrderAdminEmail = (orderData) => {
           </div>
 
           <div class="total">
-            <h2>💰 Total Amount</h2>
+            <h2>💰 Total Beløb</h2>
             <p style="font-size: 24px; margin: 0;">${totalPrice} ${currency}</p>
           </div>
 
           <div class="section">
-            <p><strong>📅 Order Date:</strong> ${new Date(orderDate).toLocaleString()}</p>
-            <p><strong>🔢 Order Number:</strong> ${orderNumber}</p>
-            <p><strong>📧 Customer Contact:</strong> ${email}</p>
+            <p><strong>📅 Ordredato:</strong> ${new Date(orderDate).toLocaleString('da-DK')}</p>
+            <p><strong>🔢 Ordrenummer:</strong> ${orderNumber}</p>
+            <p><strong>📧 Kunde kontakt:</strong> ${email}</p>
           </div>
         </div>
       </div>
@@ -424,25 +516,26 @@ const capOrderAdminEmail = (orderData) => {
   `;
 
   const text = `
-    NEW CAP ORDER NOTIFICATION - ACTION REQUIRED
-    ============================================
+    NY HUE ORDRE NOTIFIKATION - HANDLING PÅKRÆVET
+    =============================================
 
-    Order Number: ${orderNumber}
-    Order Date: ${new Date(orderDate).toLocaleString()}
-    Customer Email: ${email}
+    Ordrenummer: ${orderNumber}
+    Ordredato: ${new Date(orderDate).toLocaleString('da-DK')}
+    Kunde e-mail: ${email}
 
-    🚨 ACTION REQUIRED: New order received and needs to be processed.
+    🚨 HANDLING PÅKRÆVET: Ny ordre modtaget og skal behandles.
 
-    CUSTOMER INFORMATION:
-    --------------------
-    Name: ${customerDetails.firstName} ${customerDetails.lastName}
-    Email: ${customerDetails.email}
-    Phone: ${customerDetails.phone}
-    ${customerDetails.company ? `Company: ${customerDetails.company}` : ''}
-    Address: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
-    ${customerDetails.notes ? `Customer Notes: ${customerDetails.notes}` : ''}
+    KUNDEINFORMATION:
+    -----------------
+    Navn: ${customerDetails.firstName} ${customerDetails.lastName}
+    E-mail: ${customerDetails.email}
+    Telefon: ${customerDetails.phone}
+    ${customerDetails.Skolenavn ? `Skolenavn: ${customerDetails.Skolenavn}` : ''}
+    Adresse: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
+    ${customerDetails.notes ? `Kundens bemærkninger: ${customerDetails.notes}` : ''}
+    ${customerDetails.deliverToSchool ? `Leveres til skole: Ja` : ''}
 
-    CAP CONFIGURATION:
+    HUE KONFIGURATION:
     ------------------
     ${Object.entries(selectedOptions)
       .map(([category, options]) => {
@@ -450,7 +543,7 @@ const capOrderAdminEmail = (orderData) => {
         if (!hasOptions) return '';
         
         return `
-        ${category.replace(/([A-Z])/g, ' $1').trim().toUpperCase()}:
+        ${formatLabel(category).toUpperCase()}:
         ${Object.entries(options)
           .map(([key, value]) => {
             if (value && value !== '' && value !== null) {
@@ -458,13 +551,13 @@ const capOrderAdminEmail = (orderData) => {
                 return Object.entries(value)
                   .map(([subKey, subValue]) => {
                     if (subValue && subValue !== '' && subValue !== null) {
-                      return `  ${subKey.replace(/([A-Z])/g, ' $1').trim()}: ${formatValue(subValue)}`;
+                      return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
                     }
                     return '';
                   })
                   .join('\n');
               }
-              return `  ${key.replace(/([A-Z])/g, ' $1').trim()}: ${formatValue(value)}`;
+              return `  ${formatLabel(key)}: ${formatValue(value)}`;
             }
             return '';
           })
@@ -473,21 +566,20 @@ const capOrderAdminEmail = (orderData) => {
       })
       .join('\n')}
 
-    TOTAL AMOUNT:
-    -------------
+    TOTAL BELØB:
+    ------------
     ${totalPrice} ${currency}
 
-    ACTION REQUIRED: Please process this order as soon as possible.
-    Customer contact: ${email}
+    HANDLING PÅKRÆVET: Behandl venligst denne ordre så snart som muligt.
+    Kunde kontakt: ${email}
   `;
 
   return {
-    subject: `🎩 NEW ORDER: Cap Order : ${orderNumber} - ${customerDetails.firstName} ${customerDetails.lastName}`,
+    subject: `🎩 NY ORDRE: Hue Ordre : ${orderNumber} - ${customerDetails.firstName} ${customerDetails.lastName}`,
     html,
     text
   };
 };
-
 
 const sendCapEmail = async (req, res) => {
   try {
