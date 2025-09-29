@@ -385,40 +385,40 @@ const capOrderAdminEmail = (orderData) => {
 
   const formatLabel = (label) => {
     const labelMap = {
-      'firstName': 'Fornavn',
-      'lastName': 'Efternavn',
-      'email': 'E-mail',
-      'phone': 'Telefon',
-      'Skolenavn': 'Skolenavn',
-      'address': 'Adresse',
-      'city': 'By',
-      'postalCode': 'Postnummer',
-      'country': 'Land',
-      'notes': 'Bemærkninger',
-      'deliverToSchool': 'Leveres til skole',
-      'KOKARDE': 'Kokarde',
-      'Roset farve': 'Roset farve',
-      'Kokarde': 'Kokarde',
+      'firstName': 'First Name',
+      'lastName': 'Last Name',
+      'email': 'Email',
+      'phone': 'Phone',
+      'Skolenavn': 'School Name',
+      'address': 'Address',
+      'city': 'City',
+      'postalCode': 'Postal Code',
+      'country': 'Country',
+      'notes': 'Notes',
+      'deliverToSchool': 'Deliver to School',
+      'KOKARDE': 'Cockade',
+      'Roset farve': 'Rosette Color',
+      'Kokarde': 'Cockade',
       'Emblem': 'Emblem',
       'Type': 'Type',
-      'TILBEHØR': 'Tilbehør',
-      'Hueæske': 'Hueæske',
-      'Premium æske': 'Premium æske',
-      'Huekuglepen': 'Huekuglepen',
-      'Silkepude': 'Silkepude',
-      'Ekstra korkarde': 'Ekstra korkarde',
-      'Ekstra korkarde Text': 'Ekstra korkarde tekst',
-      'Handsker': 'Handsker',
-      'Stor kuglepen': 'Stor kuglepen',
+      'TILBEHØR': 'Accessories',
+      'Hueæske': 'Cap Box',
+      'Premium æske': 'Premium Box',
+      'Huekuglepen': 'Cap Ballpoint Pen',
+      'Silkepude': 'Silk Pillow',
+      'Ekstra korkarde': 'Extra Cockade',
+      'Ekstra korkarde Text': 'Extra Cockade Text',
+      'Handsker': 'Gloves',
+      'Stor kuglepen': 'Large Ballpoint Pen',
       'Smart Tag': 'Smart Tag',
-      'Lyskugle': 'Lyskugle',
-      'Luksus champagneglas': 'Luksus champagneglas',
-      'Fløjte': 'Fløjte',
-      'Trrompet': 'Trompet',
-      'Bucketpins': 'Bucketpins',
-      'STØRRELSE': 'Størrelse',
-      'Vælg størrelse': 'Vælg størrelse',
-      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt'
+      'Lyskugle': 'Light Ball',
+      'Luksus champagneglas': 'Luxury Champagne Glass',
+      'Fløjte': 'Whistle',
+      'Trrompet': 'Trumpet',
+      'Bucketpins': 'Bucket Pins',
+      'STØRRELSE': 'Size',
+      'Vælg størrelse': 'Select Size',
+      'Millimeter tilpasningssæt': 'Millimeter Adjustment Set'
     };
     return labelMap[label] || label.replace(/([A-Z])/g, ' $1').trim();
   };
@@ -428,15 +428,15 @@ const capOrderAdminEmail = (orderData) => {
       return value.name || value.value || JSON.stringify(value);
     }
     if (typeof value === 'boolean') {
-      return value ? 'Ja' : 'Nej';
+      return value ? 'Yes' : 'No';
     }
     if (value === '') {
-      return 'Ikke angivet';
+      return 'Not specified';
     }
-    if (value === 'No') return 'Nej';
-    if (value === 'Yes') return 'Ja';
+    if (value === 'No') return 'No';
+    if (value === 'Yes') return 'Yes';
     if (value === 'Standard') return 'Standard';
-    if (value === 'NONE') return 'Ingen';
+    if (value === 'NONE') return 'None';
     return value;
   };
 
@@ -468,35 +468,35 @@ const capOrderAdminEmail = (orderData) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎩 NY HUE ORDRE MODTAGET</h1>
-          <p>Ordrenummer: ${orderNumber} | ${new Date(orderDate).toLocaleDateString('da-DK')}</p>
+          <h1>🎩 NEW GRADUATION CAP ORDER RECEIVED</h1>
+          <p>Order Number: ${orderNumber} | ${new Date(orderDate).toLocaleDateString('en-US')}</p>
         </div>
         
         <div class="content">
           <div class="priority">
-            <strong>🚨 HANDLING PÅKRÆVET:</strong> Ny ordre modtaget og skal behandles.
+            <strong>🚨 ACTION REQUIRED:</strong> New order received and needs to be processed.
           </div>
          <div class="warning payment-pending">
-           <strong>⏳ AFVENTER BETALING:</strong> Ordren er modtaget, men betalingen afventes.
+           <strong>⏳ PAYMENT PENDING:</strong> Order has been received but payment is pending.
           </div>
           
           <div class="alert">
-            <strong>📧 Kunde e-mail:</strong> ${customerDetails.email}
+            <strong>📧 Customer Email:</strong> ${customerDetails.email}
           </div>
 
           <div class="section">
-            <h2>👤 Kundeinformation</h2>
-            <p><strong>Navn:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
-            <p><strong>E-mail:</strong> ${customerDetails.email}</p>
-            <p><strong>Telefon:</strong> ${customerDetails.phone}</p>
-            ${customerDetails.Skolenavn ? `<p><strong>Skolenavn:</strong> ${customerDetails.Skolenavn}</p>` : ''}
-            <p><strong>Adresse:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
-            ${customerDetails.notes ? `<p><strong>Kundens bemærkninger:</strong> ${customerDetails.notes}</p>` : ''}
-            ${customerDetails.deliverToSchool ? `<p><strong>Leveres til skole:</strong> Ja</p>` : ''}
+            <h2>👤 Customer Information</h2>
+            <p><strong>Name:</strong> ${customerDetails.firstName} ${customerDetails.lastName}</p>
+            <p><strong>Email:</strong> ${customerDetails.email}</p>
+            <p><strong>Phone:</strong> ${customerDetails.phone}</p>
+            ${customerDetails.Skolenavn ? `<p><strong>School Name:</strong> ${customerDetails.Skolenavn}</p>` : ''}
+            <p><strong>Address:</strong> ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}</p>
+            ${customerDetails.notes ? `<p><strong>Customer Notes:</strong> ${customerDetails.notes}</p>` : ''}
+            ${customerDetails.deliverToSchool ? `<p><strong>Deliver to School:</strong> Yes</p>` : ''}
           </div>
 
           <div class="section">
-            <h2>⚙️ Hue Konfiguration</h2>
+            <h2>⚙️ Cap Configuration</h2>
             ${Object.entries(selectedOptions)
       .map(([category, options]) => {
         const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
@@ -513,14 +513,14 @@ const capOrderAdminEmail = (orderData) => {
           </div>
 
           <div class="total">
-            <h2>💰 Total Beløb</h2>
+            <h2>💰 Total Amount</h2>
             <p style="font-size: 24px; margin: 0;">${totalPrice} ${currency}</p>
           </div>
 
           <div class="section">
-            <p><strong>📅 Ordredato:</strong> ${new Date(orderDate).toLocaleString('da-DK')}</p>
-            <p><strong>🔢 Ordrenummer:</strong> ${orderNumber}</p>
-            <p><strong>📧 Kunde kontakt:</strong> ${customerDetails.email}</p>
+            <p><strong>📅 Order Date:</strong> ${new Date(orderDate).toLocaleString('en-US')}</p>
+            <p><strong>🔢 Order Number:</strong> ${orderNumber}</p>
+            <p><strong>📧 Customer Contact:</strong> ${customerDetails.email}</p>
           </div>
         </div>
       </div>
@@ -529,26 +529,26 @@ const capOrderAdminEmail = (orderData) => {
   `;
 
   const text = `
-    NY HUE ORDRE NOTIFIKATION - HANDLING PÅKRÆVET
-    =============================================
+    NEW GRADUATION CAP ORDER NOTIFICATION - ACTION REQUIRED
+    ======================================================
 
-    Ordrenummer: ${orderNumber}
-    Ordredato: ${new Date(orderDate).toLocaleString('da-DK')}
-    Kunde e-mail: ${email}
+    Order Number: ${orderNumber}
+    Order Date: ${new Date(orderDate).toLocaleString('en-US')}
+    Customer Email: ${email}
 
-    🚨 HANDLING PÅKRÆVET: Ny ordre modtaget og skal behandles.
+    🚨 ACTION REQUIRED: New order received and needs to be processed.
 
-    KUNDEINFORMATION:
-    -----------------
-    Navn: ${customerDetails.firstName} ${customerDetails.lastName}
-    E-mail: ${customerDetails.email}
-    Telefon: ${customerDetails.phone}
-    ${customerDetails.Skolenavn ? `Skolenavn: ${customerDetails.Skolenavn}` : ''}
-    Adresse: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
-    ${customerDetails.notes ? `Kundens bemærkninger: ${customerDetails.notes}` : ''}
-    ${customerDetails.deliverToSchool ? `Leveres til skole: Ja` : ''}
+    CUSTOMER INFORMATION:
+    ---------------------
+    Name: ${customerDetails.firstName} ${customerDetails.lastName}
+    Email: ${customerDetails.email}
+    Phone: ${customerDetails.phone}
+    ${customerDetails.Skolenavn ? `School Name: ${customerDetails.Skolenavn}` : ''}
+    Address: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.postalCode}, ${customerDetails.country}
+    ${customerDetails.notes ? `Customer Notes: ${customerDetails.notes}` : ''}
+    ${customerDetails.deliverToSchool ? `Deliver to School: Yes` : ''}
 
-    HUE KONFIGURATION:
+    CAP CONFIGURATION:
     ------------------
     ${Object.entries(selectedOptions)
       .map(([category, options]) => {
@@ -579,16 +579,16 @@ const capOrderAdminEmail = (orderData) => {
       })
       .join('\n')}
 
-    TOTAL BELØB:
-    ------------
+    TOTAL AMOUNT:
+    -------------
     ${totalPrice} ${currency}
 
-    HANDLING PÅKRÆVET: Behandl venligst denne ordre så snart som muligt.
-    Kunde kontakt: ${customerDetails.email}
+    ACTION REQUIRED: Please process this order as soon as possible.
+    Customer Contact: ${customerDetails.email}
   `;
 
   return {
-    subject: `🎩 NY ORDRE: Hue Ordre : ${orderNumber} - ${customerDetails.firstName} ${customerDetails.lastName}`,
+    subject: `🎩 NEW ORDER: Graduation Cap Order : ${orderNumber} - ${customerDetails.firstName} ${customerDetails.lastName}`,
     html,
     text
   };
