@@ -584,7 +584,7 @@ const capOrderAdminEmail = (orderData) => {
     ${totalPrice} ${currency}
 
     HANDLING PÅKRÆVET: Behandl venligst denne ordre så snart som muligt.
-    Kunde kontakt: ${email}
+    Kunde kontakt: ${customerDetails.email}
   `;
 
   return {
