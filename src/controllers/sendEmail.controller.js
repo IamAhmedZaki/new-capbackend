@@ -18,7 +18,7 @@ const createEmailTransporter = () => {
 
 
 
-const generateWorkFlowChangeEmail = (orderItem, customer, order,currentStage) => {
+const generateWorkFlowChangeEmail = (orderItem, customer, order, currentStage) => {
   const orderItemUrl = `https://elipsestudio.com/CustomerChecker/customercheckpage.html`;
 
   return {
@@ -66,26 +66,28 @@ Your Company Team`
 
 
 
-const workflowStatusChange=async(req,res)=>{
+const workflowStatusChange = async (req, res) => {
 
-     try {
+  try {
     const { id } = req.params;
     const {
-      
+
       currentStage,
-     
+
       updatedBy,
       // Optional: new list of sizes to replace
     } = req.body;
 
     const existingOrderItem = await prisma.orderItem.findUnique({
       where: { id: parseInt(id) },
-      include: { order:{
-        include:{
-            customer:true
-        }
+      include: {
+        order: {
+          include: {
+            customer: true
+          }
+        },
+        product: true
       },
-    product:true },
     });
 
     if (!existingOrderItem) {
@@ -96,15 +98,15 @@ const workflowStatusChange=async(req,res)=>{
     const updatedOrderItem = await prisma.orderItem.update({
       where: { id: parseInt(id) },
       data: {
-        
+
         currentStage,
-        
+
         updatedBy,
       },
     });
 
     const transporter = createEmailTransporter();
-    const emailContent = generateWorkFlowChangeEmail(existingOrderItem, existingOrderItem.order.customer, existingOrderItem.order,currentStage);
+    const emailContent = generateWorkFlowChangeEmail(existingOrderItem, existingOrderItem.order.customer, existingOrderItem.order, currentStage);
 
     const mailOptions = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
@@ -115,10 +117,10 @@ const workflowStatusChange=async(req,res)=>{
     };
 
     const resultDeEmail = await transporter.sendMail(mailOptions);
-    
+
     const result = await prisma.orderItem.findUnique({
       where: { id: parseInt(id) },
-      
+
     });
 
     res.status(200).json(result);
@@ -126,7 +128,7 @@ const workflowStatusChange=async(req,res)=>{
     console.error('Update OrderItem Error:', error);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
-    
+
 
 }
 
@@ -257,18 +259,18 @@ const capOrderEmail = (orderData) => {
           <div class="section">
             <h2>Hue Konfiguration</h2>
             ${Object.entries(selectedOptions)
-              .map(([category, options]) => {
-                const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
-                if (!hasOptions) return '';
-                
-                return `
+      .map(([category, options]) => {
+        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        if (!hasOptions) return '';
+
+        return `
                   <h3>${formatLabel(category)}</h3>
                   <table>
                     ${formatOptions(options)}
                   </table>
                 `;
-              })
-              .join('')}
+      })
+      .join('')}
           </div>
 
           <div class="total">
@@ -309,27 +311,27 @@ const capOrderEmail = (orderData) => {
       .map(([category, options]) => {
         const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
         if (!hasOptions) return '';
-        
+
         return `
         ${formatLabel(category).toUpperCase()}:
         ${Object.entries(options)
-          .map(([key, value]) => {
-            if (value && value !== '' && value !== null) {
-              if (typeof value === 'object') {
-                return Object.entries(value)
-                  .map(([subKey, subValue]) => {
-                    if (subValue && subValue !== '' && subValue !== null) {
-                      return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
-                    }
-                    return '';
-                  })
-                  .join('\n');
+            .map(([key, value]) => {
+              if (value && value !== '' && value !== null) {
+                if (typeof value === 'object') {
+                  return Object.entries(value)
+                    .map(([subKey, subValue]) => {
+                      if (subValue && subValue !== '' && subValue !== null) {
+                        return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
+                      }
+                      return '';
+                    })
+                    .join('\n');
+                }
+                return `  ${formatLabel(key)}: ${formatValue(value)}`;
               }
-              return `  ${formatLabel(key)}: ${formatValue(value)}`;
-            }
-            return '';
-          })
-          .join('\n')}
+              return '';
+            })
+            .join('\n')}
         `;
       })
       .join('\n')}
@@ -466,9 +468,12 @@ const capOrderAdminEmail = (orderData) => {
           <div class="priority">
             <strong>🚨 HANDLING PÅKRÆVET:</strong> Ny ordre modtaget og skal behandles.
           </div>
+         <div class="warning payment-pending">
+           <strong>⏳ AFVENTER BETALING:</strong> Ordren er modtaget, men betalingen afventes.
+          </div>
           
           <div class="alert">
-            <strong>📧 Kunde e-mail:</strong> ${email}
+            <strong>📧 Kunde e-mail:</strong> ${customerDetails.email}
           </div>
 
           <div class="section">
@@ -485,18 +490,18 @@ const capOrderAdminEmail = (orderData) => {
           <div class="section">
             <h2>⚙️ Hue Konfiguration</h2>
             ${Object.entries(selectedOptions)
-              .map(([category, options]) => {
-                const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
-                if (!hasOptions) return '';
-                
-                return `
+      .map(([category, options]) => {
+        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        if (!hasOptions) return '';
+
+        return `
                   <h3>${formatLabel(category)}</h3>
                   <table>
                     ${formatOptions(options)}
                   </table>
                 `;
-              })
-              .join('')}
+      })
+      .join('')}
           </div>
 
           <div class="total">
@@ -541,27 +546,27 @@ const capOrderAdminEmail = (orderData) => {
       .map(([category, options]) => {
         const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
         if (!hasOptions) return '';
-        
+
         return `
         ${formatLabel(category).toUpperCase()}:
         ${Object.entries(options)
-          .map(([key, value]) => {
-            if (value && value !== '' && value !== null) {
-              if (typeof value === 'object') {
-                return Object.entries(value)
-                  .map(([subKey, subValue]) => {
-                    if (subValue && subValue !== '' && subValue !== null) {
-                      return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
-                    }
-                    return '';
-                  })
-                  .join('\n');
+            .map(([key, value]) => {
+              if (value && value !== '' && value !== null) {
+                if (typeof value === 'object') {
+                  return Object.entries(value)
+                    .map(([subKey, subValue]) => {
+                      if (subValue && subValue !== '' && subValue !== null) {
+                        return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
+                      }
+                      return '';
+                    })
+                    .join('\n');
+                }
+                return `  ${formatLabel(key)}: ${formatValue(value)}`;
               }
-              return `  ${formatLabel(key)}: ${formatValue(value)}`;
-            }
-            return '';
-          })
-          .join('\n')}
+              return '';
+            })
+            .join('\n')}
         `;
       })
       .join('\n')}
@@ -595,8 +600,8 @@ const sendCapEmail = async (req, res) => {
 
     // Validate required fields
     if (!customerDetails || !selectedOptions || !email) {
-      return res.status(400).json({ 
-        message: 'Missing required fields: customerDetails, selectedOptions, and email are required' 
+      return res.status(400).json({
+        message: 'Missing required fields: customerDetails, selectedOptions, and email are required'
       });
     }
 
@@ -625,7 +630,7 @@ const sendCapEmail = async (req, res) => {
       html: emailContent.html,
       text: emailContent.text
     };
-    
+
     const mailOptionsAdmin = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
       to: "mahmedzaki670@gmail.com",
@@ -636,7 +641,7 @@ const sendCapEmail = async (req, res) => {
     // Send email
     const emailResult = await transporter.sendMail(mailOptions);
     const emailResultAdmin = await transporter.sendMail(mailOptionsAdmin);
-    
+
     // Optionally save to database using Prisma
     try {
       const orderData = {
@@ -678,14 +683,14 @@ const sendCapEmail = async (req, res) => {
 
   } catch (error) {
     console.error('Send Cap Email Error:', error);
-    res.status(500).json({ 
-      message: 'Internal Server Error', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message
     });
   }
 };
 
-const stripePayment=async (req,res) => {
+const stripePayment = async (req, res) => {
   const { orderNumber, totalPrice, email } = req.body;
 
   try {
@@ -706,7 +711,7 @@ const stripePayment=async (req,res) => {
       ],
       mode: "payment",
       success_url: "http://elipsestudio.com/studentlife/success?session_id={CHECKOUT_SESSION_ID}",
-cancel_url: "http://elipsestudio.com/studentlife/cancel",
+      cancel_url: "http://elipsestudio.com/studentlife/cancel",
     });
 
     res.json({ id: session.id });
@@ -733,5 +738,5 @@ const getSessionDetails = async (req, res) => {
 
 
 module.exports = {
-    workflowStatusChange,sendCapEmail,stripePayment,getSessionDetails                                                  
+  workflowStatusChange, sendCapEmail, stripePayment, getSessionDetails
 };
