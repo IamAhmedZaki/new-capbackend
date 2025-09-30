@@ -641,7 +641,7 @@ const sendCapEmail = async (req, res) => {
 
     const mailOptionsAdmin = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-      to: "yousaf_farooq@hotmail.com",
+      to: "salg@studentlife.dk",
       subject: emailContentAdmin.subject,
       html: emailContentAdmin.html,
       text: emailContentAdmin.text
@@ -718,6 +718,8 @@ const stripePayment = async (req, res) => {
         },
       ],
       mode: "payment",
+      // 👇 Force Danish language
+      locale: "da",
       success_url: "http://elipsestudio.com/studentlife/success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "http://elipsestudio.com/studentlife/cancel",
     });
@@ -726,8 +728,8 @@ const stripePayment = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
 
-}
 
 const getSessionDetails = async (req, res) => {
   const { session_id } = req.query;
