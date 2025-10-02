@@ -143,24 +143,34 @@ const capOrderEmail = (orderData) => {
     orderDate
   } = orderData;
 
-  // Format the order details for email
+  // Enhanced formatOptions to handle different value structures
   const formatOptions = (options) => {
     return Object.entries(options)
       .map(([key, value]) => {
+        // Skip if value is empty, null, or false
+        if (!value || value === '' || value === null || value === false) {
+          return '';
+        }
+
+        // Handle nested objects with name/value properties
         if (typeof value === 'object' && value !== null) {
+          // If it's an object with name property (like Roset farve)
+          if (value.name) {
+            return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value.name)}</td></tr>`;
+          }
+          // If it's an object with multiple properties, format each one
           return Object.entries(value)
             .map(([subKey, subValue]) => {
-              if (subValue && subValue !== '' && subValue !== null) {
+              if (subValue && subValue !== '' && subValue !== null && subValue !== false) {
                 return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(subKey)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
               }
               return '';
             })
             .join('');
         }
-        if (value && value !== '' && value !== null) {
-          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
-        }
-        return '';
+
+        // Handle simple values
+        return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
       })
       .join('');
   };
@@ -178,12 +188,12 @@ const capOrderEmail = (orderData) => {
       'country': 'Land',
       'notes': 'Bemærkninger',
       'deliverToSchool': 'Leveres til skole',
-      'KOKARDE': 'Kokarde',
+      'KOKARDE': 'KOKARDE',
       'Roset farve': 'Roset farve',
       'Kokarde': 'Kokarde',
       'Emblem': 'Emblem',
       'Type': 'Type',
-      'TILBEHØR': 'Tilbehør',
+      'TILBEHØR': 'TILBEHØR',
       'Hueæske': 'Hueæske',
       'Premium æske': 'Premium æske',
       'Huekuglepen': 'Huekuglepen',
@@ -192,22 +202,53 @@ const capOrderEmail = (orderData) => {
       'Ekstra korkarde Text': 'Ekstra korkarde tekst',
       'Handsker': 'Handsker',
       'Stor kuglepen': 'Stor kuglepen',
+      'Store kuglepen': 'Store kuglepen',
       'Smart Tag': 'Smart Tag',
       'Lyskugle': 'Lyskugle',
       'Luksus champagneglas': 'Luksus champagneglas',
       'Fløjte': 'Fløjte',
-      'Trrompet': 'Trompet',
+      'Trompet': 'Trompet',
       'Bucketpins': 'Bucketpins',
-      'STØRRELSE': 'Størrelse',
+      'STØRRELSE': 'STØRRELSE',
       'Vælg størrelse': 'Vælg størrelse',
-      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt'
+      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt',
+      'UDDANNELSESBÅND': 'UDDANNELSESBÅND',
+      'Huebånd': 'Huebånd',
+      'Materiale': 'Materiale',
+      'Hagerem': 'Hagerem',
+      'Hagerem Materiale': 'Hagerem Materiale',
+      'Broderi farve': 'Broderi farve',
+      'Knap farve': 'Knap farve',
+      'år': 'år',
+      'BRODERI': 'BRODERI',
+      'Broderifarve': 'Broderifarve',
+      'Skolebroderi farve': 'Skolebroderi farve',
+      'Ingen': 'Ingen',
+      'BETRÆK': 'BETRÆK',
+      'Farve': 'Farve',
+      'Topkant': 'Topkant',
+      'Kantbånd': 'Kantbånd',
+      'Stjerner': 'Stjerner',
+      'SKYGGE': 'SKYGGE',
+      'Skyggebånd': 'Skyggebånd',
+      'FOER': 'FOER',
+      'Svederem': 'Svederem',
+      'Sløjfe': 'Sløjfe',
+      'Foer': 'Foer',
+      'SatinType': 'Satin Type',
+      'SilkeType': 'Silke Type',
+      'EKSTRABETRÆK': 'EKSTRABETRÆK',
+      'Tilvælg': 'Tilvælg'
     };
-    return labelMap[label] || label.replace(/([A-Z])/g, ' $1').trim();
+    return labelMap[label] || label;
   };
 
   const formatValue = (value) => {
-    if (typeof value === 'object') {
-      return value.name || value.value || JSON.stringify(value);
+    if (typeof value === 'object' && value !== null) {
+      // Prefer showing "name" if it exists
+      if (value.name) return value.name;
+      if (value.value) return value.value;
+      return JSON.stringify(value); // fallback
     }
     if (typeof value === 'boolean') {
       return value ? 'Ja' : 'Nej';
@@ -218,7 +259,10 @@ const capOrderEmail = (orderData) => {
     if (value === 'No') return 'Nej';
     if (value === 'Yes') return 'Ja';
     if (value === 'Standard') return 'Standard';
-    if (value === 'NONE') return 'Ingen';
+    if (value === 'NONE') return 'NONE';
+    if (value === 'INGEN') return 'INGEN';
+    if (value === false) return 'Nej';
+    if (value === true) return 'Ja';
     return value;
   };
 
@@ -235,6 +279,7 @@ const capOrderEmail = (orderData) => {
         .section { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #e5e7eb; }
         .total { background: #d1fae5; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; }
+        .category-header { background: #f3f4f6; padding: 8px 12px; margin: 15px 0 8px 0; border-radius: 4px; font-weight: bold; }
       </style>
     </head>
     <body>
@@ -260,11 +305,14 @@ const capOrderEmail = (orderData) => {
             <h2>Hue Konfiguration</h2>
             ${Object.entries(selectedOptions)
       .map(([category, options]) => {
-        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        const hasOptions = Object.values(options).some(val => 
+          val && val !== '' && val !== null && val !== false && 
+          !(typeof val === 'object' && Object.keys(val).length === 0)
+        );
         if (!hasOptions) return '';
 
         return `
-                  <h3>${formatLabel(category)}</h3>
+                  <div class="category-header">${formatLabel(category)}</div>
                   <table>
                     ${formatOptions(options)}
                   </table>
@@ -288,6 +336,7 @@ const capOrderEmail = (orderData) => {
     </html>
   `;
 
+  // Enhanced text version formatting
   const text = `
     TILPASSET HUE ORDRE BEKRÆFTELSE
     ================================
@@ -309,31 +358,38 @@ const capOrderEmail = (orderData) => {
     ------------------
     ${Object.entries(selectedOptions)
       .map(([category, options]) => {
-        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        const hasOptions = Object.values(options).some(val => 
+          val && val !== '' && val !== null && val !== false && 
+          !(typeof val === 'object' && Object.keys(val).length === 0)
+        );
         if (!hasOptions) return '';
 
-        return `
-        ${formatLabel(category).toUpperCase()}:
-        ${Object.entries(options)
-            .map(([key, value]) => {
-              if (value && value !== '' && value !== null) {
-                if (typeof value === 'object') {
-                  return Object.entries(value)
-                    .map(([subKey, subValue]) => {
-                      if (subValue && subValue !== '' && subValue !== null) {
-                        return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
-                      }
-                      return '';
-                    })
-                    .join('\n');
-                }
-                return `  ${formatLabel(key)}: ${formatValue(value)}`;
+        const optionsText = Object.entries(options)
+          .map(([key, value]) => {
+            if (!value || value === '' || value === null || value === false) return '';
+
+            if (typeof value === 'object' && value !== null) {
+              if (value.name) {
+                return `${formatLabel(key)}: ${formatValue(value.name)}`;
               }
-              return '';
-            })
-            .join('\n')}
-        `;
+              return Object.entries(value)
+                .map(([subKey, subValue]) => {
+                  if (subValue && subValue !== '' && subValue !== null && subValue !== false) {
+                    return `${formatLabel(subKey)}: ${formatValue(subValue)}`;
+                  }
+                  return '';
+                })
+                .filter(Boolean)
+                .join('\n');
+            }
+            return `${formatLabel(key)}: ${formatValue(value)}`;
+          })
+          .filter(Boolean)
+          .join('\n');
+
+        return `${formatLabel(category).toUpperCase()}\n${optionsText}\n`;
       })
+      .filter(Boolean)
       .join('\n')}
 
     TOTAL BELØB:
@@ -349,7 +405,6 @@ const capOrderEmail = (orderData) => {
     text
   };
 };
-
 const capOrderAdminEmail = (orderData) => {
   const {
     customerDetails,
@@ -358,27 +413,32 @@ const capOrderAdminEmail = (orderData) => {
     currency,
     orderNumber,
     orderDate,
-    email // Customer email
+    email
   } = orderData;
 
-  // Format the order details for email
+  // Enhanced formatOptions for admin email
   const formatOptions = (options) => {
     return Object.entries(options)
       .map(([key, value]) => {
+        if (!value || value === '' || value === null || value === false) {
+          return '';
+        }
+
         if (typeof value === 'object' && value !== null) {
+          if (value.name) {
+            return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value.name)}</td></tr>`;
+          }
           return Object.entries(value)
             .map(([subKey, subValue]) => {
-              if (subValue && subValue !== '' && subValue !== null) {
+              if (subValue && subValue !== '' && subValue !== null && subValue !== false) {
                 return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(subKey)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(subValue)}</td></tr>`;
               }
               return '';
             })
             .join('');
         }
-        if (value && value !== '' && value !== null) {
-          return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
-        }
-        return '';
+
+        return `<tr><td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${formatLabel(key)}:</td><td style="padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">${formatValue(value)}</td></tr>`;
       })
       .join('');
   };
@@ -396,36 +456,66 @@ const capOrderAdminEmail = (orderData) => {
       'country': 'Country',
       'notes': 'Notes',
       'deliverToSchool': 'Deliver to School',
-      'KOKARDE': 'Cockade',
-      'Roset farve': 'Rosette Color',
-      'Kokarde': 'Cockade',
+      'KOKARDE': 'KOKARDE',
+      'Roset farve': 'Roset farve',
+      'Kokarde': 'Kokarde',
       'Emblem': 'Emblem',
       'Type': 'Type',
-      'TILBEHØR': 'Accessories',
-      'Hueæske': 'Cap Box',
-      'Premium æske': 'Premium Box',
-      'Huekuglepen': 'Cap Ballpoint Pen',
-      'Silkepude': 'Silk Pillow',
-      'Ekstra korkarde': 'Extra Cockade',
-      'Ekstra korkarde Text': 'Extra Cockade Text',
-      'Handsker': 'Gloves',
-      'Stor kuglepen': 'Large Ballpoint Pen',
+      'TILBEHØR': 'TILBEHØR',
+      'Hueæske': 'Hueæske',
+      'Premium æske': 'Premium æske',
+      'Huekuglepen': 'Huekuglepen',
+      'Silkepude': 'Silkepude',
+      'Ekstra korkarde': 'Ekstra korkarde',
+      'Ekstra korkarde Text': 'Ekstra korkarde tekst',
+      'Handsker': 'Handsker',
+      'Stor kuglepen': 'Stor kuglepen',
+      'Store kuglepen': 'Store kuglepen',
       'Smart Tag': 'Smart Tag',
-      'Lyskugle': 'Light Ball',
-      'Luksus champagneglas': 'Luxury Champagne Glass',
-      'Fløjte': 'Whistle',
-      'Trrompet': 'Trumpet',
-      'Bucketpins': 'Bucket Pins',
-      'STØRRELSE': 'Size',
-      'Vælg størrelse': 'Select Size',
-      'Millimeter tilpasningssæt': 'Millimeter Adjustment Set'
+      'Lyskugle': 'Lyskugle',
+      'Luksus champagneglas': 'Luksus champagneglas',
+      'Fløjte': 'Fløjte',
+      'Trompet': 'Trompet',
+      'Bucketpins': 'Bucketpins',
+      'STØRRELSE': 'STØRRELSE',
+      'Vælg størrelse': 'Vælg størrelse',
+      'Millimeter tilpasningssæt': 'Millimeter tilpasningssæt',
+      'UDDANNELSESBÅND': 'UDDANNELSESBÅND',
+      'Huebånd': 'Huebånd',
+      'Materiale': 'Materiale',
+      'Hagerem': 'Hagerem',
+      'Hagerem Materiale': 'Hagerem Materiale',
+      'Broderi farve': 'Broderi farve',
+      'Knap farve': 'Knap farve',
+      'år': 'år',
+      'BRODERI': 'BRODERI',
+      'Broderifarve': 'Broderifarve',
+      'Skolebroderi farve': 'Skolebroderi farve',
+      'Ingen': 'Ingen',
+      'BETRÆK': 'BETRÆK',
+      'Farve': 'Farve',
+      'Topkant': 'Topkant',
+      'Kantbånd': 'Kantbånd',
+      'Stjerner': 'Stjerner',
+      'SKYGGE': 'SKYGGE',
+      'Skyggebånd': 'Skyggebånd',
+      'FOER': 'FOER',
+      'Svederem': 'Svederem',
+      'Sløjfe': 'Sløjfe',
+      'Foer': 'Foer',
+      'SatinType': 'Satin Type',
+      'SilkeType': 'Silke Type',
+      'EKSTRABETRÆK': 'EKSTRABETRÆK',
+      'Tilvælg': 'Tilvælg'
     };
-    return labelMap[label] || label.replace(/([A-Z])/g, ' $1').trim();
+    return labelMap[label] || label;
   };
 
   const formatValue = (value) => {
-    if (typeof value === 'object') {
-      return value.name || value.value || JSON.stringify(value);
+    if (typeof value === 'object' && value !== null) {
+      if (value.name) return value.name;
+      if (value.value) return value.value;
+      return JSON.stringify(value);
     }
     if (typeof value === 'boolean') {
       return value ? 'Yes' : 'No';
@@ -436,7 +526,10 @@ const capOrderAdminEmail = (orderData) => {
     if (value === 'No') return 'No';
     if (value === 'Yes') return 'Yes';
     if (value === 'Standard') return 'Standard';
-    if (value === 'NONE') return 'None';
+    if (value === 'NONE') return 'NONE';
+    if (value === 'INGEN') return 'INGEN';
+    if (value === false) return 'No';
+    if (value === true) return 'Yes';
     return value;
   };
 
@@ -453,16 +546,17 @@ const capOrderAdminEmail = (orderData) => {
         .section { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #e5e7eb; }
         .total { background: #dbeafe; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; }
+        .category-header { background: #f3f4f6; padding: 8px 12px; margin: 15px 0 8px 0; border-radius: 4px; font-weight: bold; }
         .alert { background: #fef3c7; padding: 10px; border-radius: 5px; border-left: 4px solid #f59e0b; margin-bottom: 15px; }
         .priority { background: #fee2e2; padding: 10px; border-radius: 5px; border-left: 4px solid #ef4444; margin-bottom: 15px; }
         .payment-pending {
-  background: #fff3cd;
-  padding: 12px;
-  border-radius: 6px;
-  border-left: 4px solid #ffc107;
-  margin-bottom: 15px;
-  color: #856404;
-}
+          background: #fff3cd;
+          padding: 12px;
+          border-radius: 6px;
+          border-left: 4px solid #ffc107;
+          margin-bottom: 15px;
+          color: #856404;
+        }
       </style>
     </head>
     <body>
@@ -476,8 +570,8 @@ const capOrderAdminEmail = (orderData) => {
           <div class="priority">
             <strong>🚨 ACTION REQUIRED:</strong> New order received and needs to be processed.
           </div>
-         <div class="warning payment-pending">
-           <strong>⏳ PAYMENT PENDING:</strong> Order has been received but payment is pending.
+          <div class="payment-pending">
+            <strong>⏳ PAYMENT PENDING:</strong> Order has been received but payment is pending.
           </div>
           
           <div class="alert">
@@ -499,11 +593,14 @@ const capOrderAdminEmail = (orderData) => {
             <h2>⚙️ Cap Configuration</h2>
             ${Object.entries(selectedOptions)
       .map(([category, options]) => {
-        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        const hasOptions = Object.values(options).some(val => 
+          val && val !== '' && val !== null && val !== false && 
+          !(typeof val === 'object' && Object.keys(val).length === 0)
+        );
         if (!hasOptions) return '';
 
         return `
-                  <h3>${formatLabel(category)}</h3>
+                  <div class="category-header">${formatLabel(category)}</div>
                   <table>
                     ${formatOptions(options)}
                   </table>
@@ -552,31 +649,38 @@ const capOrderAdminEmail = (orderData) => {
     ------------------
     ${Object.entries(selectedOptions)
       .map(([category, options]) => {
-        const hasOptions = Object.values(options).some(val => val && val !== '' && val !== null);
+        const hasOptions = Object.values(options).some(val => 
+          val && val !== '' && val !== null && val !== false && 
+          !(typeof val === 'object' && Object.keys(val).length === 0)
+        );
         if (!hasOptions) return '';
 
-        return `
-        ${formatLabel(category).toUpperCase()}:
-        ${Object.entries(options)
-            .map(([key, value]) => {
-              if (value && value !== '' && value !== null) {
-                if (typeof value === 'object') {
-                  return Object.entries(value)
-                    .map(([subKey, subValue]) => {
-                      if (subValue && subValue !== '' && subValue !== null) {
-                        return `  ${formatLabel(subKey)}: ${formatValue(subValue)}`;
-                      }
-                      return '';
-                    })
-                    .join('\n');
-                }
-                return `  ${formatLabel(key)}: ${formatValue(value)}`;
+        const optionsText = Object.entries(options)
+          .map(([key, value]) => {
+            if (!value || value === '' || value === null || value === false) return '';
+
+            if (typeof value === 'object' && value !== null) {
+              if (value.name) {
+                return `${formatLabel(key)}: ${formatValue(value.name)}`;
               }
-              return '';
-            })
-            .join('\n')}
-        `;
+              return Object.entries(value)
+                .map(([subKey, subValue]) => {
+                  if (subValue && subValue !== '' && subValue !== null && subValue !== false) {
+                    return `${formatLabel(subKey)}: ${formatValue(subValue)}`;
+                  }
+                  return '';
+                })
+                .filter(Boolean)
+                .join('\n');
+            }
+            return `${formatLabel(key)}: ${formatValue(value)}`;
+          })
+          .filter(Boolean)
+          .join('\n');
+
+        return `${formatLabel(category).toUpperCase()}\n${optionsText}\n`;
       })
+      .filter(Boolean)
       .join('\n')}
 
     TOTAL AMOUNT:
@@ -641,7 +745,7 @@ const sendCapEmail = async (req, res) => {
 
     const mailOptionsAdmin = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-      to: "yousaf_farooq@hotmail.com",
+      to: "salg@studentlife.dk",
       subject: emailContentAdmin.subject,
       html: emailContentAdmin.html,
       text: emailContentAdmin.text
@@ -663,14 +767,14 @@ const sendCapEmail = async (req, res) => {
         status: 'PENDING'
       };
 
-      const result = await prisma.order.create({
-        data: orderData
-      });
+      // const result = await prisma.order.create({
+      //   data: orderData
+      // });
 
       res.status(200).json({
         message: 'Order created and email sent successfully',
-        orderId: result.id,
-        orderNumber: result.orderNumber,
+        // orderId: result.id,
+        // orderNumber: result.orderNumber,
         emailResult: {
           messageId: emailResult.messageId,
           accepted: emailResult.accepted
