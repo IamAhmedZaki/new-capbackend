@@ -822,6 +822,8 @@ const stripePayment = async (req, res) => {
         },
       ],
       mode: "payment",
+      // 👇 Force Danish language
+      locale: "da",
       success_url: "http://elipsestudio.com/studentlife/success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "http://elipsestudio.com/studentlife/cancel",
     });
@@ -830,8 +832,8 @@ const stripePayment = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
 
-}
 
 const getSessionDetails = async (req, res) => {
   const { session_id } = req.query;
