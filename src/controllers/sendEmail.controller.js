@@ -4,9 +4,21 @@ const Stripe = require('stripe');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// const createEmailTransporter = () => {
+//   return nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: false, // use TLS later
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS, // must be an App Password
+//     },
+//   });
+// };
+
 const createEmailTransporter = () => {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "smtp.simply.com",
     port: 587,
     secure: false, // use TLS later
     auth: {
@@ -15,6 +27,9 @@ const createEmailTransporter = () => {
     },
   });
 };
+
+
+
 
 
 
@@ -745,7 +760,7 @@ const sendCapEmail = async (req, res) => {
 
     const mailOptionsAdmin = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-      to: "salg@studentlife.dk",
+      to: "mahmedzaki670@gmail.com",
       subject: emailContentAdmin.subject,
       html: emailContentAdmin.html,
       text: emailContentAdmin.text
